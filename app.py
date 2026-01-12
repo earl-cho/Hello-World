@@ -47,44 +47,7 @@ if not df.empty:
 else:
     st.warning("아직 데이터가 없습니다. engine.py를 실행해주세요!")
 
-# ... (위쪽 코드는 그대로 두세요) ...
 
-# ---------------------------------------------------------
-# [AI 리포트 섹션] 추가
-# ---------------------------------------------------------
-st.markdown("---") # 구분선
-st.subheader("🤖 AI Analyst Report")
-
-# DB에서 최신 리포트 1개 가져오기
-report_response = supabase.table("ai_reports") \
-    .select("*") \
-    .order("created_at", desc=True) \
-    .limit(1) \
-    .execute()
-
-if report_response.data:
-    report = report_response.data[0]
-    
-    # 감정에 따른 색상 설정
-    sentiment_color = "gray"
-    if "매수" in report['sentiment']:
-        sentiment_color = "green"
-    elif "매도" in report['sentiment']:
-        sentiment_color = "red"
-        
-    # 예쁜 박스 안에 보여주기
-    with st.container(border=True):
-        st.markdown(f"### {report['title']}")
-        st.caption(f"작성일: {report['created_at'][:10]} | 의견: :{sentiment_color}[{report['sentiment']}]")
-        st.write(report['content'])
-else:
-    st.info("아직 작성된 리포트가 없습니다. reporter.py를 실행해보세요!")
-
-    # ... (위에는 차트 그리는 코드가 있을 겁니다) ...
-
-# ---------------------------------------------------------
-# [AI 리포트 섹션] 여기부터 복사해서 맨 아래에 붙이세요!
-# ---------------------------------------------------------
 st.markdown("---") # 구분선
 st.subheader("🤖 AI Analyst Report")
 

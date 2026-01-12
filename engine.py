@@ -2,12 +2,22 @@ import ccxt
 import time
 from supabase import create_client
 from datetime import datetime
+import os
+from dotenv import load_dotenv # [추가] 비밀 금고 여는 도구
 
 # ---------------------------------------------------------
-# [설정] Supabase 프로젝트 키 (따옴표 안에 복사한 값을 넣으세요)
+# [보안 설정] .env 파일에서 키 꺼내오기
 # ---------------------------------------------------------
-SUPABASE_URL = 'https://hrfqvipwxuqssnnwowno.supabase.co'
-SUPABASE_KEY = 'sb_publishable_Sdz_-3XX4Y05hgcBHooRPw_yufksqyO'
+load_dotenv() # .env 파일을 찾아서 로딩함
+
+SUPABASE_URL = os.getenv("SUPABASE_URL")
+SUPABASE_KEY = os.getenv("SUPABASE_KEY")
+
+# 키가 잘 가져와졌는지 확인 (없으면 에러 냄)
+if not SUPABASE_URL or not SUPABASE_KEY:
+    print("❌ 에러: .env 파일을 찾을 수 없거나 키가 비어있습니다.")
+    exit()
+# ---------------------------------------------------------
 
 # DB 연결
 supabase = create_client(SUPABASE_URL, SUPABASE_KEY)

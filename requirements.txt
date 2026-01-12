@@ -3,3 +3,6 @@ pandas
 supabase
 ccxt
 plotly
+google-generativeai
+google-search-results
+python-dotenv
