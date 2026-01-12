@@ -1,4 +1,5 @@
 import os
+import streamlit as st # secrets를 쓰기 위해 추가
 from supabase import create_client
 import google.generativeai as genai
 from serpapi import GoogleSearch
@@ -6,13 +7,18 @@ import json
 from datetime import datetime
 
 # ===============================================================
-# [설정] 여기에 API Key를 넣어주세요! (따옴표 안에 붙여넣기)
+# [보안 설정] Secrets에서 키 가져오기 (이제 해킹 걱정 없음!)
 # ===============================================================
-SUPABASE_URL = 'https://hrfqvipwxuqssnnwowno.supabase.co'
-SUPABASE_KEY = 'sb_publishable_Sdz_-3XX4Y05hgcBHooRPw_yufksqyO'
-
-GEMINI_API_KEY = "AIzaSyDc9KG-b2_ogiEiPGC8AMz4wMUIwu7P_Wc"
-SERPAPI_KEY = "9850b83fd97faa83c91915d6c788126273174c0217a1f2c306ad93956ae543fd"
+# 내 컴퓨터에서는 .streamlit/secrets.toml 에서 가져오고,
+# 웹사이트에서는 아까 설정한 Secrets에서 가져옵니다.
+try:
+    SUPABASE_URL = st.secrets["SUPABASE_URL"]
+    SUPABASE_KEY = st.secrets["SUPABASE_KEY"]
+    GEMINI_API_KEY = st.secrets["GEMINI_API_KEY"]
+    SERPAPI_KEY = st.secrets["SERPAPI_KEY"]
+except FileNotFoundError:
+    print("❌ 에러: .streamlit/secrets.toml 파일을 찾을 수 없습니다.")
+    exit()
 # ===============================================================
 
 # 1. 연결 설정
