@@ -4,15 +4,11 @@ from supabase import create_client
 import time
 
 # ---------------------------------------------------------
-# [설정] Supabase 키 (engine.py에 넣었던 것과 똑같은 것!)
+# [설정] Secrets에서 키 가져오기 (보안 강화)
 # ---------------------------------------------------------
-SUPABASE_URL = 'https://hrfqvipwxuqssnnwowno.supabase.co'
-SUPABASE_KEY = 'sb_publishable_Sdz_-3XX4Y05hgcBHooRPw_yufksqyO'
+# 이제 코드를 누가 훔쳐봐도 키는 모릅니다.
+supabase = create_client(st.secrets["SUPABASE_URL"], st.secrets["SUPABASE_KEY"])
 
-# DB 연결
-supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
-
-# ---------------------------------------------------------
 # [화면 구성]
 # ---------------------------------------------------------
 st.set_page_config(page_title="Blackboard Dashboard", layout="wide")
