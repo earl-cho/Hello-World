@@ -1,61 +1,58 @@
-import ccxt
-import time
-from supabase import create_client
-from datetime import datetime
+# engine.py (가격 수집 전용)
 import os
-from dotenv import load_dotenv # [추가] 비밀 금고 여는 도구
+import time
+import requests
+from supabase import create_client
+from dotenv import load_dotenv
 
-# ---------------------------------------------------------
-# [보안 설정] .env 파일에서 키 꺼내오기
-# ---------------------------------------------------------
-load_dotenv() # .env 파일을 찾아서 로딩함
-
+# 1. 설정 로드
+load_dotenv()
 SUPABASE_URL = os.getenv("SUPABASE_URL")
 SUPABASE_KEY = os.getenv("SUPABASE_KEY")
 
-# 키가 잘 가져와졌는지 확인 (없으면 에러 냄)
 if not SUPABASE_URL or not SUPABASE_KEY:
-    print("❌ 에러: .env 파일을 찾을 수 없거나 키가 비어있습니다.")
+    print("❌ .env 파일 오류: 키가 없습니다.")
     exit()
-# ---------------------------------------------------------
 
-# DB 연결
-supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
+try:
+    supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
+except Exception as e:
+    print(f"❌ Supabase 연결 실패: {e}")
+    exit()
 
-# 바이낸스 거래소 연결 (데이터 가져오는 곳)
-exchange = ccxt.binance()
-
-def fetch_and_save():
+def get_bitcoin_price():
+    """바이낸스에서 비트코인 가격 조회"""
     try:
-        # 1. 바이낸스에서 비트코인 가격 조회
-        ticker = exchange.fetch_ticker('BTC/USDT')
-        current_price = ticker['last']
-        
-        # 2. 펀딩비 조회 (선물 시장 데이터)
-        # 현물(Spot)에는 펀딩비가 없어서 예외처리 하거나, 선물(Swap) 시장을 봐야 함
-        # 일단은 가격만 먼저 저장해서 테스트
-        
-        print(f"💰 현재 BTC 가격: {current_price} USDT")
-
-        # 3. 데이터 포장
-        data = {
-            "ticker": "BTC/USDT",
-            "price": current_price,
-            "created_at": datetime.utcnow().isoformat()
-        }
-
-        # 4. Supabase(DB)로 쏘기!
-        # 'market_data' 테이블이 없으면 에러가 납니다. (Table 생성 필수)
-        response = supabase.table("market_data").insert(data).execute()
-        print("✅ DB 저장 완료!")
-
+        url = "https://api.binance.com/api/v3/ticker/price?symbol=BTCUSDT"
+        response = requests.get(url, timeout=5)
+        data = response.json()
+        return float(data['price'])
     except Exception as e:
-        print(f"❌ 에러 발생: {e}")
+        print(f"⚠️ 가격 조회 실패: {e}")
+        return None
 
-# ---------------------------------------------------------
-# [실행] 10초마다 반복 (테스트용)
-# ---------------------------------------------------------
-print("🚀 블랙보드 데이터 엔진 시동 중...")
-while True:
-    fetch_and_save()
-    time.sleep(10) # 10초 휴식
+def main():
+    print("🚀 [Engine Start] 비트코인 가격 수집기를 가동합니다...")
+    print("   (종료하려면 Ctrl+C를 누르세요)")
+    
+    while True:
+        price = get_bitcoin_price()
+        
+        if price:
+            try:
+                # DB 저장
+                data = {"symbol": "BTC", "price": price}
+                supabase.table("market_data").insert(data).execute()
+                print(f"✅ 저장 완료: ${price:,.2f}")
+            except Exception as e:
+                # 여기서 401 에러가 나면 키가 틀린 것임
+                print(f"❌ DB 저장 실패: {e}")
+                if "401" in str(e):
+                    print("🚨 치명적 오류: API 키가 틀렸습니다. .env를 확인하세요.")
+                    break
+        
+        # 5분 대기 (테스트할 땐 10초로 줄여도 됨)
+        time.sleep(300) 
+
+if __name__ == "__main__":
+    main()

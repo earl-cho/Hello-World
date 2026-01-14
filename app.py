@@ -1,78 +1,73 @@
+# app.py (대시보드 전용)
 import streamlit as st
 import pandas as pd
 from supabase import create_client
 import time
+import os
+from dotenv import load_dotenv
 
-# ---------------------------------------------------------
-# [설정] Secrets에서 키 가져오기 (보안 강화)
-# ---------------------------------------------------------
-# 이제 코드를 누가 훔쳐봐도 키는 모릅니다.
-supabase = create_client(st.secrets["SUPABASE_URL"], st.secrets["SUPABASE_KEY"])
+# 페이지 설정
+st.set_page_config(page_title="Blackboard Dashboard", page_icon="♟️", layout="wide")
 
-# [화면 구성]
-# ---------------------------------------------------------
-st.set_page_config(page_title="Blackboard Dashboard", layout="wide")
-st.title("📈 Blackboard: Crypto Live")
+# 키 로드
+load_dotenv()
+try:
+    SUPABASE_URL = st.secrets["SUPABASE_URL"]
+    SUPABASE_KEY = st.secrets["SUPABASE_KEY"]
+except:
+    SUPABASE_URL = os.getenv("SUPABASE_URL")
+    SUPABASE_KEY = os.getenv("SUPABASE_KEY")
 
-# 새로고침 버튼
-if st.button('데이터 새로고침'):
+if not SUPABASE_URL:
+    st.error("❌ API 키가 없습니다.")
+    st.stop()
+
+# DB 연결
+try:
+    supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
+except Exception as e:
+    st.error(f"DB 연결 실패: {e}")
+    st.stop()
+
+# --- UI 시작 ---
+st.title("♟️ Blackboard : Crypto & Intelligence")
+if st.button("🔄 새로고침"):
     st.rerun()
+st.divider()
 
-# 1. DB에서 데이터 가져오기 (최신 100개만)
-response = supabase.table("market_data") \
-    .select("*") \
-    .order("created_at", desc=True) \
-    .limit(100) \
-    .execute()
+# 1. 차트 섹션
+st.subheader("📈 Bitcoin Price (Live)")
+try:
+    # market_data 테이블에서 가져옴
+    res = supabase.table("market_data").select("*").order("created_at", desc=True).limit(288).execute()
+    if res.data:
+        df = pd.DataFrame(res.data)
+        df = df.sort_values('created_at')
+        latest = df.iloc[-1]['price']
+        st.metric("BTC/USDT", f"${latest:,.2f}")
+        st.line_chart(df, x='created_at', y='price', color='#F7931A')
+    else:
+        st.info("데이터가 없습니다. 터미널에서 'python engine.py'를 실행하세요.")
+except Exception as e:
+    st.error(f"차트 에러: {e}")
 
-# 2. 데이터 가공 (Pandas 사용)
-df = pd.DataFrame(response.data)
+st.divider()
 
-if not df.empty:
-    # 시간 순서대로 정렬 (차트 그리기 위해)
-    df = df.sort_values('created_at')
-    
-    # 가장 최신 가격
-    last_price = df.iloc[-1]['price']
-    st.metric(label="BTC/USDT", value=f"${last_price:,.2f}")
-
-    # 3. 차트 그리기
-    st.subheader("Price Chart (Real-time)")
-    # X축: 시간, Y축: 가격
-    st.line_chart(data=df, x='created_at', y='price', color='#00FF00')
-
-    # 4. 데이터 표 보여주기 (옵션)
-    with st.expander("Raw Data 보기"):
-        st.dataframe(df)
-else:
-    st.warning("아직 데이터가 없습니다. engine.py를 실행해주세요!")
-
-
-st.markdown("---") # 구분선
+# 2. 리포트 섹션
 st.subheader("🤖 AI Analyst Report")
-
-# 1. DB에서 최신 리포트 1개 가져오기
-report_response = supabase.table("ai_reports") \
-    .select("*") \
-    .order("created_at", desc=True) \
-    .limit(1) \
-    .execute()
-
-# 2. 화면에 예쁘게 보여주기
-if report_response.data:
-    report = report_response.data[0]
-    
-    # 감정(매수/매도)에 따라 색상 정하기
-    sentiment_color = "gray"
-    if "매수" in report['sentiment']:
-        sentiment_color = "green" # 호재면 초록색
-    elif "매도" in report['sentiment']:
-        sentiment_color = "red"   # 악재면 빨간색
-        
-    # 박스 안에 내용 출력
-    with st.container(border=True):
-        st.markdown(f"### {report['title']}")
-        st.caption(f"작성일: {report['created_at'][:10]} | 투자의견: :{sentiment_color}[{report['sentiment']}]")
-        st.write(report['content'])
-else:
-    st.info("아직 도착한 리포트가 없습니다. 잠시 후 다시 시도해주세요.")
+try:
+    # market_reports 테이블에서 가져옴
+    res = supabase.table("market_reports").select("*").order("created_at", desc=True).limit(1).execute()
+    if res.data:
+        report = res.data[0]
+        c1, c2 = st.columns([3, 1])
+        with c1:
+            st.markdown(f"### {report['title']}")
+            st.markdown(report['content'])
+        with c2:
+            st.info(f"**요약**\n\n{report['summary_3lines']}")
+            st.caption(f"발행: {report['created_at'][:16]}")
+    else:
+        st.warning("리포트가 없습니다. 'python editor.py'를 실행하세요.")
+except Exception as e:
+    st.error(f"리포트 에러: {e}")
