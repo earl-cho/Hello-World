@@ -6,3 +6,7 @@ plotly
 google-generativeai
 google-search-results
 python-dotenv
+schedule
+feedparser
+requests
+beautifulsoup4

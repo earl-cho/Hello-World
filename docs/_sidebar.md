@@ -1,9 +1,4 @@
 <!-- _sidebar.md -->
 
-* [Introduction](intro.md)
-* [Getting Started](getting-started.md)
-* [Trading Guide](trading-guide.md)
-* [Product Features](features.md)
-* [Tech & Infrastructure](tech-infra.md)
-* [Fees and Rewards](fees-rewards.md)
-* [Security and Safety](security.md)
+* [The Manifesto](intro.md)
+* [Waitlist](https://blackboard.xyz/waitlist)

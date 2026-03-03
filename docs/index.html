@@ -2,60 +2,370 @@
 <html lang="en">
 
 <head>
-  <meta charset="UTF-8">
-  <title>Blackboard Docs</title>
-  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
-  <meta name="description" content="Official Documentation for Blackboard On-Chain Terminal">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
-  <!-- Theme: Simple (Hyperliquid-like) -->
-  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/docsify@4/lib/themes/vue.css">
-  <style>
-    :root {
-      --theme-color: #000000;
-      --sidebar-width: 280px;
-    }
+    <meta charset="UTF-8">
+    <title>Blackboard | The Manifesto</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <meta name="description" content="Blackboard: The Gateway to On-Chain Finance. One Terminal. All Markets.">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
 
-    .sidebar {
-      background-color: #f9f9f9;
-      border-right: 1px solid #eee;
-    }
+    <!-- Premium Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
 
-    .markdown-section {
-      max-width: 800px;
-    }
+    <!-- Theme: Dark (Customized Figma/Euphoria Style) -->
+    <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/docsify@4/lib/themes/dark.css">
 
-    /* Simple and professional typography */
-    body {
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    }
-  </style>
+    <style>
+        :root {
+            --theme-color: #00FF88;
+            --sidebar-width: 320px;
+            --content-max-width: 900px;
+            --bg-color: #000000;
+            --accent-color: #00FF88;
+            --text-main: #FFFFFF;
+            --text-muted: #A1A1AA;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            -webkit-font-smoothing: antialiased;
+            scroll-behavior: smooth;
+        }
+
+        /* Background Glow Effect */
+        body::before {
+            content: '';
+            position: fixed;
+            top: -10%;
+            right: -10%;
+            width: 50%;
+            height: 50%;
+            background: radial-gradient(circle, rgba(0, 255, 136, 0.05) 0%, rgba(0, 0, 0, 0) 70%);
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        /* Sidebar Styling */
+        .sidebar {
+            background-color: #000000;
+            /* Absolute black to match logo background better */
+            border-right: 1px solid #111;
+            padding-top: 40px;
+        }
+
+        .sidebar>h1 {
+            margin: 0;
+            padding: 0 25px;
+            margin-bottom: 20px;
+        }
+
+        .sidebar>h1 a {
+            text-decoration: none;
+            display: block;
+        }
+
+        .app-logo {
+            width: 100%;
+            height: auto;
+            max-width: 250px;
+            display: block;
+            background-color: transparent;
+            /* mix-blend-mode: screen removed for transparent PNG */
+            filter: drop-shadow(0 0 10px rgba(0, 255, 136, 0.1));
+            transition: all 0.3s ease;
+            margin: 0 auto;
+        }
+
+        .app-logo:hover {
+            filter: drop-shadow(0 0 15px rgba(0, 255, 136, 0.3));
+            transform: scale(1.02);
+        }
+
+        .sidebar-nav {
+            padding: 0 25px;
+            margin-top: 20px;
+        }
+
+        .sidebar-nav li a {
+            font-weight: 800;
+            /* Extra Bold like requested */
+            color: var(--text-muted);
+            font-size: 24px;
+            /* Much larger */
+            letter-spacing: -0.02em;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            margin-bottom: 25px;
+            /* More spacing */
+            display: block;
+            padding: 10px 0;
+            border-right: none !important;
+            text-transform: uppercase;
+            text-decoration: none !important;
+            /* More visible */
+        }
+
+        .sidebar-nav li a:hover {
+            color: var(--accent-color);
+            transform: translateX(8px);
+            text-decoration: none !important;
+        }
+
+        .sidebar-nav li.active>a {
+            color: var(--accent-color) !important;
+            font-weight: 900;
+            text-shadow: 0 0 15px rgba(0, 255, 136, 0.5);
+            transform: translateX(8px);
+            text-decoration: none !important;
+        }
+
+        /* Content Styling */
+        .markdown-section {
+            padding: 80px 60px;
+            line-height: 1.8;
+            background-color: transparent;
+        }
+
+        h1 {
+            font-weight: 900;
+            letter-spacing: -0.06em;
+            margin-bottom: 3.5rem;
+            font-size: 4.5rem;
+            line-height: 1;
+            color: var(--text-main);
+        }
+
+        h2,
+        h3 {
+            font-weight: 800;
+            letter-spacing: -0.04em;
+            color: var(--accent-color);
+            text-shadow: 0 0 15px rgba(0, 255, 136, 0.2);
+            padding-bottom: 0;
+            transition: all 0.3s ease;
+            position: relative;
+            display: inline-block;
+            border-bottom: 3px solid transparent;
+            text-decoration: none !important;
+        }
+
+        h2 {
+            margin-top: 5.5rem;
+            margin-bottom: 2rem;
+            font-size: 2.8rem;
+        }
+
+        h3 {
+            margin-top: 3rem;
+            margin-bottom: 1.5rem;
+            font-size: 1.8rem;
+            color: var(--text-main);
+            /* H3 can be white but hover green */
+        }
+
+        h2:hover,
+        h3:hover {
+            border-bottom: 3px solid var(--accent-color);
+            color: var(--accent-color) !important;
+            text-shadow: 0 0 20px rgba(0, 255, 136, 0.5);
+            text-decoration: none !important;
+        }
+
+        .markdown-section h1 a,
+        .markdown-section h2 a,
+        .markdown-section h3 a,
+        .markdown-section h1 a:hover,
+        .markdown-section h2 a:hover,
+        .markdown-section h3 a:hover {
+            text-decoration: none !important;
+            color: inherit !important;
+            border-bottom: none !important;
+        }
+
+        /* Remove sidebar toggle button (3 lines) */
+        .sidebar-toggle {
+            display: none !important;
+        }
+
+        @media screen and (max-width: 768px) {
+            .sidebar-toggle {
+                display: block !important;
+                background: rgba(0, 0, 0, 0.8) !important;
+                border-radius: 0 8px 8px 0;
+            }
+        }
+
+        p {
+            color: var(--text-muted);
+            font-size: 1.35rem;
+            margin-bottom: 2.2rem;
+        }
+
+        strong {
+            color: var(--text-main);
+            font-weight: 800;
+        }
+
+        blockquote {
+            border-left: 4px solid var(--accent-color);
+            margin: 3.5rem 0;
+            padding: 2rem 3rem;
+            background: rgba(255, 255, 255, 0.03);
+            font-style: normal;
+            font-size: 1.5rem;
+            color: var(--text-main);
+            border-radius: 0 8px 8px 0;
+        }
+
+        /* Grid Overlay like Figma */
+        .markdown-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: radial-gradient(#111 1px, transparent 1px);
+            background-size: 45px 45px;
+            opacity: 0.4;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        /* Right Side TOC Style - Stabilized */
+        .page_toc {
+            position: fixed;
+            right: 40px;
+            top: 150px;
+            padding-left: 25px;
+            border-left: 2px solid #111;
+            width: 250px;
+            background: transparent;
+            z-index: 10;
+        }
+
+        .page_toc b {
+            color: var(--accent-color);
+            text-transform: uppercase;
+            font-size: 13px;
+            font-weight: 800;
+            letter-spacing: 0.2em;
+            margin-bottom: 25px;
+            display: block;
+            opacity: 0.9;
+        }
+
+        .page_toc div a {
+            color: #555 !important;
+            font-weight: 600 !important;
+            text-decoration: none !important;
+            font-size: 14px !important;
+            transition: all 0.3s ease;
+            display: block;
+            margin-bottom: 15px;
+            line-height: 1.4;
+        }
+
+        .page_toc .active a,
+        .page_toc div a:hover {
+            color: var(--accent-color) !important;
+            font-weight: 800 !important;
+            text-shadow: 0 0 10px rgba(0, 255, 136, 0.4);
+            transform: translateX(5px);
+        }
+
+        /* Search Bar Styling */
+        .search {
+            padding: 0 25px 30px;
+        }
+
+        .search input {
+            background: #0a0a0a !important;
+            border: 1px solid #1a1a1a !important;
+            color: var(--text-main) !important;
+            border-radius: 12px !important;
+            padding: 12px 15px !important;
+            font-size: 16px !important;
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #1a1a1a;
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--accent-color);
+        }
+
+        @media screen and (max-width: 1200px) {
+            .page_toc {
+                display: none;
+            }
+        }
+
+        @media screen and (max-width: 768px) {
+            .markdown-section {
+                padding: 40px 20px;
+            }
+
+            h1 {
+                font-size: 2.8rem;
+            }
+
+            h2 {
+                font-size: 2rem;
+            }
+        }
+    </style>
 </head>
 
 <body>
-  <div id="app">Please wait...</div>
-  <script>
-    window.$docsify = {
-      name: 'Blackboard Docs',
-      repo: 'earl-holdings/blackboard-docs',
-      loadSidebar: true,
-      homepage: 'intro.md',
-      subMaxLevel: 2,
-      auto2top: true,
-      coverpage: false,
-      executeScript: true,
-      search: 'auto',
-      pagination: {
-        previousText: 'Previous',
-        nextText: 'Next',
-        crossChapter: true,
-        crossChapterText: true,
-      },
-    }
-  </script>
-  <!-- Docsify v4 -->
-  <script src="//cdn.jsdelivr.net/npm/docsify@4"></script>
-  <script src="//cdn.jsdelivr.net/npm/docsify/lib/plugins/search.min.js"></script>
-  <script src="//cdn.jsdelivr.net/npm/docsify-pagination/dist/docsify-pagination.min.js"></script>
+    <div id="app">Connection Initializing... Blackboard Terminal v1.0</div>
+    <script>
+        window.$docsify = {
+            name: 'Blackboard',
+            repo: '',
+            loadSidebar: true,
+            homepage: 'intro.md',
+            auto2top: true,
+            executeScript: true,
+            search: 'auto',
+            toc: {
+                scope: '.markdown-section',
+                headings: 'h1, h2, h3',
+                title: 'ON THIS PAGE',
+            },
+            plugins: [
+                function (hook, vm) {
+                    hook.doneEach(function () {
+                        // Ensure logo is correctly placed in sidebar-nav top on every page load
+                        const sidebarName = document.querySelector('.sidebar h1.app-name');
+                        if (sidebarName) {
+                            sidebarName.innerHTML = `
+                                <a href="#/" class="logo-link" style="display: block; text-align: center;">
+                                    <img src="logo.png" class="app-logo" alt="Blackboard Logo">
+                                </a>
+                            `;
+                        }
+                    });
+                }
+            ]
+        }
+    </script>
+    <!-- Docsify v4 -->
+    <script src="//cdn.jsdelivr.net/npm/docsify@4"></script>
+    <script src="//cdn.jsdelivr.net/npm/docsify/lib/plugins/search.min.js"></script>
+    <!-- TOC Plugin -->
+    <link rel="stylesheet" href="https://unpkg.com/docsify-plugin-toc@1.3.1/dist/light.css">
+    <script src="https://unpkg.com/docsify-plugin-toc@1.3.1/dist/docsify-plugin-toc.min.js"></script>
 </body>
 
 </html>
