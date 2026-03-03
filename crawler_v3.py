@@ -225,6 +225,7 @@ def save_to_db(category, source, title, link, date, summary="", image_url=None):
         "url": link,
         "published_date": str(date),
         "summary": summary[:1000],
+        "content": summary, # [FIX] article_writer와의 호환성을 위해 content 필드에도 저장
         "image_url": image_url
     }
     try:

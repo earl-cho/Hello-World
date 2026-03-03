@@ -15,7 +15,7 @@ GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 # 모델 설정 (최신 안정 버전 및 정교한 파라미터 적용)
 genai.configure(api_key=GEMINI_API_KEY)
 # [🛡️ PARAMETER TUNING] 사실성 강화를 위해 temperature를 낮게 유지
-model = genai.GenerativeModel('gemini-1.5-pro', generation_config={"temperature": 0.3})
+model = genai.GenerativeModel('gemini-2.0-flash', generation_config={"temperature": 0.3})
 
 def get_latest_intelligence():
     supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
@@ -44,8 +44,13 @@ def generate_masterpiece():
         print("📭 분석할 인텔리전스가 없습니다.")
         return
 
-    # 컨텍스트 구성
-    context = "\n".join([f"[{i+1}] {item['title']}: {item['content'][:500]}" for i, item in enumerate(raw_intel)])
+    # 컨텍스트 구성 (content가 없을 경우 summary를 대안으로 사용)
+    context_list = []
+    for i, item in enumerate(raw_intel):
+        text_body = item.get('content') or item.get('summary') or ""
+        context_list.append(f"[{i+1}] {item['title']}: {text_body[:500]}")
+    
+    context = "\n".join(context_list)
     past_context = "\n".join([f"- {r['title']}" for r in past_reports])
 
     # [🔥 MASTERPIECE PROMPT - 100% OWNER CUSTOMIZED]
